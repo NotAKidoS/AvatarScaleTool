@@ -218,7 +218,7 @@ public class AvatarScaleTool : EditorWindow
         style.alignment = TextAnchor.MiddleCenter;
         style.fontSize = 16;
 
-        string text = $"{heightText}\n{height}";
+        string text = $"{heightText}\n{height}m";
         Vector3 pos = new Vector3(-0.5f, height + 0.05f, 0f);
         Handles.Label(pos, text, style);
     }
@@ -239,8 +239,8 @@ public class AvatarScaleTool : EditorWindow
 
             Keyframe[] keys = new Keyframe[]
             {
-                new Keyframe(0f, minScale),
-                new Keyframe(0.0333333333333333f, maxScale),
+                new Keyframe(0f, minScale, 0.0f, 0.0f),
+                new Keyframe(0.0333333333333333f, maxScale, 0.0f, 0.0f),
             };
 
             AnimationCurve curve = new AnimationCurve(keys);
@@ -249,8 +249,8 @@ public class AvatarScaleTool : EditorWindow
 
         Keyframe[] motionKeys = new Keyframe[]
         {
-            new Keyframe(0f, minLocoSpeed),
-            new Keyframe(0.0333333333333333f, maxLocoSpeed),
+            new Keyframe(0f, minLocoSpeed, 0.0f, 0.0f),
+            new Keyframe(0.0333333333333333f, maxLocoSpeed, 0.0f, 0.0f),
         };
         AnimationCurve motionScaleCurve = new AnimationCurve(motionKeys);
         clip.SetCurve("", typeof(Animator), "#MotionScale", motionScaleCurve);
@@ -261,11 +261,31 @@ public class AvatarScaleTool : EditorWindow
 
         if (!string.IsNullOrEmpty(savePath))
         {
-            AssetDatabase.CreateAsset(clip, savePath);
-            AssetDatabase.SaveAssets();
-            Debug.Log($"Avatar scale animation clip created and saved to {savePath}");
+            // Check if an animation clip already exists at savePath
+            AnimationClip existingClip = AssetDatabase.LoadAssetAtPath<AnimationClip>(savePath);
+            if (existingClip != null)
+            {
+                // Keep the GUID of the existing animation clip
+                string guid = AssetDatabase.AssetPathToGUID(savePath);
+
+                // Edit the existing animation clip
+                EditorUtility.CopySerialized(clip, existingClip);
+                AssetDatabase.ImportAsset(savePath);
+                AssetDatabase.Refresh();
+                AssetDatabase.AssetPathToGUID(savePath);
+                Debug.Log($"Avatar scale animation clip edited and saved to {savePath} with the same GUID {guid}");
+            }
+            else
+            {
+                // Create a new animation clip
+                AssetDatabase.CreateAsset(clip, savePath);
+                AssetDatabase.SaveAssets();
+                AssetDatabase.Refresh();
+                Debug.Log($"Avatar scale animation clip created and saved to {savePath}");
+            }
         }
     }
+
 
     private static readonly string[] TransformPropertyNames = { "x", "y", "z" };
 
