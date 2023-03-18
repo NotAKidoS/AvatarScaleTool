@@ -4,7 +4,9 @@ Avatar Scale Tool is an editor script that generates avatar scaling animations f
 
 The tool is located under `NotAKid/Avatar Scale Tool`.
 
-How to Use
+![image](https://user-images.githubusercontent.com/37721153/226088034-7b518420-7f37-4c14-a8c1-ec02b9104931.png)
+
+## How to Use
 * Select the target avatar.
 * Input the desired minimum and maximum heights in meters. The viewpoint position is assumed to be the initial height.
 * Modify the Reference Avatar Height to match the height your locomotion animations are rigged for. 
@@ -17,8 +19,6 @@ Use the **Initial Height Percentage** value to set your *default* slider value i
 
 A local float parameter, `#MotionScale`, is animated alongside the root of the avatar. Add this parameter to your controller and use it as the speed modifier for your locomotion animations if you want your walking, crouch, and prone speeds to match your avatar's scaled height.
  
-![image](https://user-images.githubusercontent.com/37721153/226088034-7b518420-7f37-4c14-a8c1-ec02b9104931.png)
-
 ---
 
 Here is the block of text where I tell you it's not my fault if you're bad at Unity.
