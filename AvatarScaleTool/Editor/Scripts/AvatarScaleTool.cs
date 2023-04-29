@@ -10,8 +10,8 @@ namespace NAK.EditorTools
 {
     public static class AvatarScaleTool
     {
-        public static float referenceAvatarHeight = 1.8f;
-        public static float locomotionSpeedModifier = 1f;
+        public static float globalMinHeight = 0.25f;
+        public static float globalMaxHeight = 2.5f;
 
         public static CVRAvatar cvrAvatar;
         public static AnimatorController customController;
@@ -22,10 +22,29 @@ namespace NAK.EditorTools
         public static bool scaleDynamicBone = false;
         public static bool scaleAudioSources = true;
         public static bool splitAnimationClip = false;
-        public static bool useGlobalScaleSettings = false;
+        public static bool useGlobalScaleSettings = true;
 
         public static bool useCustomController;
         public static bool showGizmos;
+
+        internal static float GetMinimumHeight()
+        {
+            return useGlobalScaleSettings ? globalMinHeight : minimumHeight;
+        }
+
+        internal static float GetMaximumHeight()
+        {
+            return useGlobalScaleSettings ? globalMaxHeight : maximumHeight;
+        }
+
+        //cheating the math
+        internal static float CalculateLocomotionSpeed(float height)
+        {
+            const float slope = -1.143f;
+            const float yIntercept = 3.286f;
+
+            return slope * height + yIntercept;
+        }
 
         public static void AddToAvatarAdvancedSettings()
         {

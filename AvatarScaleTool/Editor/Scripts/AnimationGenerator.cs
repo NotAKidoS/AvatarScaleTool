@@ -43,17 +43,19 @@ namespace NAK.EditorTools
 
             // Create the folder path if it doesn't exist
             string[] folders = folderPath.Split('/');
-            string path = "Assets";
-            foreach (string folder in folders)
+            string path = "";
+            for (int i = 0; i < folders.Length; i++)
             {
-                if (!string.IsNullOrEmpty(folder))
+                if (!string.IsNullOrEmpty(folders[i]))
                 {
-                    string folderPathCandidate = path + "/" + folder;
-                    if (!AssetDatabase.IsValidFolder(folderPathCandidate))
+                    if (i > 0) path += "/";
+                    path += folders[i];
+
+                    if (!AssetDatabase.IsValidFolder(path))
                     {
-                        AssetDatabase.CreateFolder(path, folder);
+                        string parentFolderPath = string.Join("/", folders, 0, i);
+                        AssetDatabase.CreateFolder(parentFolderPath, folders[i]);
                     }
-                    path = folderPathCandidate;
                 }
             }
 
@@ -85,8 +87,6 @@ namespace NAK.EditorTools
             // Save clip0
             string savePath0 = $"{folderPath}/Anim_AvatarScale_Slider_Min.anim";
             AssetDatabase.CreateAsset(clip0, savePath0);
-            AssetDatabase.SaveAssets();
-            AssetDatabase.Refresh();
             Debug.Log($"Avatar scale animation clip 0 created and saved to {savePath0}");
 
             // Ping the saved clip0
@@ -95,9 +95,11 @@ namespace NAK.EditorTools
             // Save clip1
             string savePath1 = $"{folderPath}/Anim_AvatarScale_Slider_Max.anim";
             AssetDatabase.CreateAsset(clip1, savePath1);
+            Debug.Log($"Avatar scale animation clip 1 created and saved to {savePath1}");
+
+            // Refresh AssetDatabase
             AssetDatabase.SaveAssets();
             AssetDatabase.Refresh();
-            Debug.Log($"Avatar scale animation clip 1 created and saved to {savePath1}");
 
             // Ping the saved clip1
             EditorGUIUtility.PingObject(AssetDatabase.LoadAssetAtPath<AnimationClip>(savePath1));
@@ -206,9 +208,9 @@ namespace NAK.EditorTools
 
             // Animate modifier for locomotion animation speed float
             Animator animator = cvrAvatar.GetComponent<Animator>();
-            float minLocoSpeed = AvatarScaleTool.referenceAvatarHeight / GetMinimumHeight();
-            float maxLocoSpeed = AvatarScaleTool.referenceAvatarHeight / GetMaximumHeight();
 
+            float minLocoSpeed = CalculateLocomotionSpeed(GetMinimumHeight());
+            float maxLocoSpeed = CalculateLocomotionSpeed(GetMaximumHeight());
             AnimateFloatProperty(ref clip, "", animator, "#MotionScale", minLocoSpeed, maxLocoSpeed);
         }
 
@@ -232,16 +234,6 @@ namespace NAK.EditorTools
                 AnimateFloatProperty(ref clip, path, audioSource, "MinDistance", minMinRange, maxMinRange);
                 AnimateFloatProperty(ref clip, path, audioSource, "MaxDistance", minMaxRange, maxMaxRange);
             }
-        }
-
-        private static float GetMinimumHeight()
-        {
-            return useGlobalScaleSettings ? 0.25f : minimumHeight;
-        }
-
-        private static float GetMaximumHeight()
-        {
-            return useGlobalScaleSettings ? 2f : maximumHeight;
         }
 
         private static void AnimateVector3Property(ref AnimationClip clip, Component target, string propertyName, Vector3 minValue, Vector3 maxValue)

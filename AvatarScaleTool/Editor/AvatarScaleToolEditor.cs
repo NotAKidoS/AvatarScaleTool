@@ -81,8 +81,13 @@ namespace NAK.EditorTools
                 DrawMinimumHeightField();
                 DrawMaximumHeightField();
                 EditorGUI.EndDisabledGroup();
-                DrawReferenceAvatarHeightField();
+                //DrawReferenceAvatarHeightField();
+                GUIContent useGlobalScaleSettingsContent = new GUIContent("Global Scale Settings", "Locks scale settings to the predetermined min and max values. This allows for consistant scaling across avatars (same value is same height).");
+                useGlobalScaleSettings = EditorGUILayout.Toggle(useGlobalScaleSettingsContent, useGlobalScaleSettings);
+
             }
+            if (useGlobalScaleSettings)
+                EditorGUILayout.HelpBox("Settings are locked to use Global Avatar Scale settings. Using this setting allows for consistant scaling values between other avatars that have run through this script.", MessageType.Info);
         }
 
         private void DrawMinimumHeightField()
@@ -90,7 +95,7 @@ namespace NAK.EditorTools
             // Don't overwrite users values just because they are curious
             if (useGlobalScaleSettings)
             {
-                EditorGUILayout.FloatField("Minimum Height", 0.25f);
+                EditorGUILayout.FloatField("Minimum Height", globalMinHeight);
                 return;
             }
 
@@ -109,13 +114,13 @@ namespace NAK.EditorTools
                 minimumHeight = 0.05f;
             }
         }
-
+        
         private void DrawMaximumHeightField()
         {
             // Don't overwrite users values just because they are curious
             if (useGlobalScaleSettings)
             {
-                EditorGUILayout.FloatField("Maximum Height", 2f);
+                EditorGUILayout.FloatField("Maximum Height", globalMaxHeight);
                 return;
             }
 
@@ -129,17 +134,17 @@ namespace NAK.EditorTools
             }
         }
 
-        private void DrawReferenceAvatarHeightField()
-        {
-            // Reference Avatar Height
-            EditorGUILayout.BeginHorizontal();
-            AvatarScaleTool.referenceAvatarHeight = EditorGUILayout.FloatField("Reference Avatar Height", AvatarScaleTool.referenceAvatarHeight);
-            if (GUILayout.Button("Reset"))
-            {
-                AvatarScaleTool.referenceAvatarHeight = 1.8f;
-            }
-            EditorGUILayout.EndHorizontal();
-        }
+        //private void DrawReferenceAvatarHeightField()
+        //{
+        //    // Reference Avatar Height
+        //    EditorGUILayout.BeginHorizontal();
+        //    AvatarScaleTool.referenceAvatarHeight = EditorGUILayout.FloatField("Reference Avatar Height", AvatarScaleTool.referenceAvatarHeight);
+        //    if (GUILayout.Button("Reset"))
+        //    {
+        //        AvatarScaleTool.referenceAvatarHeight = 1.8f;
+        //    }
+        //    EditorGUILayout.EndHorizontal();
+        //}
 
         private void DrawOptionalScaleSettings()
         {
@@ -148,14 +153,17 @@ namespace NAK.EditorTools
             GUIStyle box = GUI.skin.GetStyle("box");
             using (new GUILayout.VerticalScope(box))
             {
-                motionScaleFloat = EditorGUILayout.Toggle("#MotionScale Parameter", motionScaleFloat);
-                //scaleDynamicBone = EditorGUILayout.Toggle("Scale Dynamic Bones", scaleDynamicBone);
-                scaleAudioSources = EditorGUILayout.Toggle("Scale Audio Sources", scaleAudioSources);
-                splitAnimationClip = EditorGUILayout.Toggle("Split Animation Clip", splitAnimationClip);
-                useGlobalScaleSettings = EditorGUILayout.Toggle("Global Scale Settings", useGlobalScaleSettings);
+                GUIContent motionScaleContent = new GUIContent("#MotionScale Parameter", "Local float parameter useful for adjusting the speed of your locomotion animations.");
+                motionScaleFloat = EditorGUILayout.Toggle(motionScaleContent, motionScaleFloat);
 
-                if (useGlobalScaleSettings)
-                EditorGUILayout.HelpBox("Settings are locked to use Global Avatar Scale settings. Using this setting allows for consistant scaling values between other avatars that have run through this script.", MessageType.Info);
+                // GUIContent scaleDynamicBoneContent = new GUIContent("Scale Dynamic Bones", "Unused. Dynamic Bone bug with CVRs implementation fucks forces.");
+                // scaleDynamicBone = EditorGUILayout.Toggle(scaleDynamicBoneContent, scaleDynamicBone);
+
+                GUIContent scaleAudioSourcesContent = new GUIContent("Scale Audio Sources", "Automatically scale Audio Source minimum and maximum distance.");
+                scaleAudioSources = EditorGUILayout.Toggle(scaleAudioSourcesContent, scaleAudioSources);
+
+                GUIContent splitAnimationClipContent = new GUIContent("Split Animation Clip", "Should the exported clip be split into two clips for use in blendtrees?");
+                splitAnimationClip = EditorGUILayout.Toggle(splitAnimationClipContent, splitAnimationClip);
             }
         }
 
@@ -189,31 +197,20 @@ namespace NAK.EditorTools
             EditorGUILayout.HelpBox(helpText, MessageType.Info);
         }
 
-        private (float, float, float) CalculateSpeedInfo()
-        {
-            float heightRatio = AvatarScaleTool.referenceAvatarHeight / initialHeight;
-            float minSpeed = AvatarScaleTool.referenceAvatarHeight / minimumHeight;
-            float maxSpeed = AvatarScaleTool.referenceAvatarHeight / maximumHeight;
-
-            return (heightRatio, minSpeed, maxSpeed);
-        }
-
         private void DrawLocomotionSpeedInfo()
         {
-            (float heightRatio, float minSpeed, float maxSpeed) = CalculateSpeedInfo();
-
             EditorGUILayout.Space();
             EditorGUILayout.LabelField("Avatar Scale Information", EditorStyles.boldLabel);
 
             GUIStyle box = GUI.skin.GetStyle("box");
             using (new GUILayout.VerticalScope(box))
             {
-                float heightPercentage = Mathf.InverseLerp(minimumHeight, maximumHeight, initialHeight);
+                float heightPercentage = Mathf.InverseLerp(GetMinimumHeight(), GetMaximumHeight(), initialHeight);
                 EditorGUILayout.LabelField("Initial Height Percentage:", $"{heightPercentage:F2}%");
 
-                EditorGUILayout.LabelField("Viewpoint Height:", $"{initialHeight}m (x{heightRatio:F2})");
-                EditorGUILayout.LabelField("Minimum Height:", $"{minimumHeight}m (x{minSpeed:F2})");
-                EditorGUILayout.LabelField("Maximum Height:", $"{maximumHeight}m (x{maxSpeed:F2})");
+                EditorGUILayout.LabelField("Viewpoint Height:", $"{initialHeight}m (x{CalculateLocomotionSpeed(initialHeight):F2})");
+                EditorGUILayout.LabelField("Minimum Height:", $"{GetMinimumHeight()}m (x{CalculateLocomotionSpeed(GetMinimumHeight()):F2})");
+                EditorGUILayout.LabelField("Maximum Height:", $"{GetMaximumHeight()}m (x{CalculateLocomotionSpeed(GetMaximumHeight()):F2})");
             }
 
             string locomotionSpeedInfo = "The right-hand number is the ratio of the reference avatar height to the set minimum and maximum heights. It's used to adjust the speed of locomotion animations to match the avatar's scale.";
@@ -230,24 +227,25 @@ namespace NAK.EditorTools
         {
             if (cvrAvatar == null || !showGizmos) return;
 
+            float initHeight = initialHeight;
+            float minHeight = GetMinimumHeight();
+            float maxHeight = GetMaximumHeight();
             Transform avatarRoot = cvrAvatar.transform;
 
             Handles.matrix = Matrix4x4.TRS(avatarRoot.position, avatarRoot.rotation, Vector3.one);
 
-            DrawGizmoBackgroundRect(maximumHeight);
-
-            DrawGizmoLine(initialHeight, Color.blue);
-            DrawGizmoLine(minimumHeight, Color.green);
-            DrawGizmoLine(maximumHeight, Color.red);
-
-            DrawHeightLabel("Initial Height", initialHeight);
-            DrawHeightLabel("Minimum Height", minimumHeight);
-            DrawHeightLabel("Maximum Height", maximumHeight);
+            DrawGizmoBackgroundRect(maxHeight);
+            DrawGizmoLine(initHeight, Color.blue);
+            DrawGizmoLine(minHeight, Color.green);
+            DrawGizmoLine(maxHeight, Color.red);
+            DrawHeightLabel("Initial Height", initHeight);
+            DrawHeightLabel("Minimum Height", minHeight);
+            DrawHeightLabel("Maximum Height", maxHeight);
 
             Handles.matrix = Matrix4x4.identity;
         }
 
-        private void DrawGizmoBackgroundRect(float maxHeight)
+        static void DrawGizmoBackgroundRect(float maxHeight)
         {
             Handles.color = new Color(0.5f, 0.5f, 0.5f, 0.5f);
 
@@ -263,7 +261,7 @@ namespace NAK.EditorTools
             );
         }
 
-        private void DrawGizmoLine(float height, Color color)
+        static void DrawGizmoLine(float height, Color color)
         {
             Handles.color = color;
             Vector3 startPos = new Vector3(0.5f, height, 0f);
@@ -271,7 +269,7 @@ namespace NAK.EditorTools
             Handles.DrawLine(startPos, endPos);
         }
 
-        private void DrawHeightLabel(string heightText, float height)
+        static void DrawHeightLabel(string heightText, float height)
         {
             GUIStyle style = new GUIStyle();
             style.normal.textColor = Color.white;
@@ -284,7 +282,7 @@ namespace NAK.EditorTools
         }
 
         //Nicked from commissioned script by Dreadrith
-        private static void DrawSeparator(int thickness = 2, int padding = 10)
+        static void DrawSeparator(int thickness = 2, int padding = 10)
         {
             Rect rect = EditorGUILayout.GetControlRect(GUILayout.Height(thickness + padding));
             rect.height = thickness;
