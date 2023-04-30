@@ -1,0 +1,17 @@
+{
+    "name": "AvatarScaleTool",
+    "references": [
+        "GUID:e23d6395ca6339d4daa4e1fa57267d04"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [
+        "CVR_CCK_EXISTS"
+    ],
+    "versionDefines": [],
+    "noEngineReferences": false
+}

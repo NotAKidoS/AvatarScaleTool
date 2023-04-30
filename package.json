@@ -1,0 +1,12 @@
+{
+  "name": "notakidonsteam.avatarscaletool",
+  "displayName": "Avatar Scale Tool",
+  "version": "1.0.4",
+  "description": "An editor script that generates avatar scaling animations based on target viewpoint heights. Using this script allows for consistant scaling values across avatars, no matter the initial height.",
+  "gitDependencies": {},
+  "vpmDependencies": {},
+  "legacyFolders": {},
+  "legacyFiles": {},
+  "localPath": ".\\Packages\\notakidonsteam.avatarscaletool",
+  "type": "tool"
+}

@@ -14,7 +14,7 @@ namespace NAK.EditorTools
 {
     public class AvatarScaleToolEditor : EditorWindow
     {
-        [MenuItem("NotAKid/Avatar Scale Tool")]
+        [MenuItem("Tools/NotAKid/Avatar Scale Tool", false, 0)]
         public static void ShowWindow()
         {
             GetWindow<AvatarScaleToolEditor>("Avatar Scale Tool");
