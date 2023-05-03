@@ -4,7 +4,7 @@ Avatar Scale Tool is an editor script that generates avatar scaling animations f
 
 The tool is located under `NotAKid/Avatar Scale Tool`.
 
-![image](https://user-images.githubusercontent.com/37721153/226088034-7b518420-7f37-4c14-a8c1-ec02b9104931.png)
+![image](https://user-images.githubusercontent.com/37721153/235814026-253c4d63-5660-47f2-8a3a-3d5b7da93435.png)
 
 ## How to Use
 * Select the target avatar.
