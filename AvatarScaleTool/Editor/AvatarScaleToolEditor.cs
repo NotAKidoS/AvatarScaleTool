@@ -24,6 +24,11 @@ namespace NAK.EditorTools
         {
             SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
+
+            float desiredWidth = 500;
+            float desiredHeight = position.height;
+            Vector2 currentPosition = position.position;
+            position = new Rect(currentPosition.x, currentPosition.y, desiredWidth, desiredHeight);
         }
 
         private void OnDisable()
@@ -153,6 +158,12 @@ namespace NAK.EditorTools
             GUIStyle box = GUI.skin.GetStyle("box");
             using (new GUILayout.VerticalScope(box))
             {
+                EditorGUILayout.BeginHorizontal();
+                EditorGUILayout.BeginVertical();
+
+                float originalLabelWidth = EditorGUIUtility.labelWidth;
+                EditorGUIUtility.labelWidth = 200;
+
                 GUIContent motionScaleContent = new GUIContent("#MotionScale Parameter", "Local float parameter useful for adjusting the speed of your locomotion animations.");
                 motionScaleFloat = EditorGUILayout.Toggle(motionScaleContent, motionScaleFloat);
 
@@ -164,6 +175,23 @@ namespace NAK.EditorTools
 
                 GUIContent splitAnimationClipContent = new GUIContent("Split Animation Clip", "Should the exported clip be split into two clips for use in blendtrees?");
                 splitAnimationClip = EditorGUILayout.Toggle(splitAnimationClipContent, splitAnimationClip);
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.BeginVertical();
+
+                GUIContent scalePositionConstraintOffsetsContent = new GUIContent("Scale Position Constraint Offsets", "Automatically scale Position Constraint rest and translation offsets.");
+                scalePositionConstraintOffsets = EditorGUILayout.Toggle(scalePositionConstraintOffsetsContent, scalePositionConstraintOffsets);
+
+                GUIContent scaleParentConstraintOffsetsContent = new GUIContent("Scale Parent Constraint Offsets", "Automatically scale Parent Constraint rest and translation offsets.");
+                scaleParentConstraintOffsets = EditorGUILayout.Toggle(scaleParentConstraintOffsetsContent, scaleParentConstraintOffsets);
+
+                GUIContent scaleScaleConstraintOffsetsContent = new GUIContent("Scale Scale Constraint Offsets", "Automatically scale Scale Constraint rest and translation scales.");
+                scaleScaleConstraintOffsets = EditorGUILayout.Toggle(scaleScaleConstraintOffsetsContent, scaleScaleConstraintOffsets);
+
+                EditorGUILayout.EndVertical();
+                EditorGUILayout.EndHorizontal();
+
+                EditorGUIUtility.labelWidth = originalLabelWidth;
             }
         }
 

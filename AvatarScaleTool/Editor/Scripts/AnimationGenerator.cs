@@ -2,6 +2,7 @@
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.Animations;
 using static NAK.EditorTools.AvatarScaleTool;
 using Object = UnityEngine.Object;
 
@@ -33,6 +34,11 @@ namespace NAK.EditorTools
             //Optional Settings
             AnimMotionScale(ref clip);
             AnimAudioSourceRange(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
+
+            //Constraint Scaling
+            AnimParentConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
+            AnimPositionConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
+            AnimScaleConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
 
             return clip;
         }
@@ -233,6 +239,65 @@ namespace NAK.EditorTools
                 string path = AnimationUtility.CalculateTransformPath(audioSource.transform, cvrAvatar.transform);
                 AnimateFloatProperty(ref clip, path, audioSource, "MinDistance", minMinRange, maxMinRange);
                 AnimateFloatProperty(ref clip, path, audioSource, "MaxDistance", minMaxRange, maxMaxRange);
+            }
+        }
+
+        private static void AnimPositionConstraintOffsets(ref AnimationClip clip, float initialToMinHeightRatio, float initialToMaxHeightRatio)
+        {
+            if (!scalePositionConstraintOffsets) return;
+
+            var positionConstraints = cvrAvatar.gameObject.GetComponentsInChildren<PositionConstraint>(true);
+            foreach (var positionConstraint in positionConstraints)
+            {
+                // Calculate min and max offsets for rest offset
+                Vector3 minRestOffset = positionConstraint.translationAtRest * initialToMinHeightRatio;
+                Vector3 maxRestOffset = positionConstraint.translationAtRest * initialToMaxHeightRatio;
+                AnimateVector3Property(ref clip, positionConstraint, "m_TranslationAtRest", minRestOffset, maxRestOffset);
+
+                // Calculate min and max offsets for position offset
+                Vector3 minPositionOffset = positionConstraint.translationOffset * initialToMinHeightRatio;
+                Vector3 maxPositionOffset = positionConstraint.translationOffset * initialToMaxHeightRatio;
+                AnimateVector3Property(ref clip, positionConstraint, "m_TranslationOffset", minPositionOffset, maxPositionOffset);
+            }
+        }
+
+        private static void AnimParentConstraintOffsets(ref AnimationClip clip, float initialToMinHeightRatio, float initialToMaxHeightRatio)
+        {
+            if (!scaleParentConstraintOffsets) return;
+
+            var parentConstraints = cvrAvatar.gameObject.GetComponentsInChildren<ParentConstraint>(true);
+            foreach (var parentConstraint in parentConstraints)
+            {
+                // Calculate min and max offsets for rest offset
+                Vector3 minRestOffset = parentConstraint.translationAtRest * initialToMinHeightRatio;
+                Vector3 maxRestOffset = parentConstraint.translationAtRest * initialToMaxHeightRatio;
+                AnimateVector3Property(ref clip, parentConstraint, "m_TranslationAtRest", minRestOffset, maxRestOffset);
+
+                foreach (var (offset, index) in parentConstraint.translationOffsets.Select((value, i) => (value, i)))
+                {
+                    Vector3 minOffset = offset * initialToMinHeightRatio;
+                    Vector3 maxOffset = offset * initialToMaxHeightRatio;
+                    AnimateVector3Property(ref clip, parentConstraint, $"m_TranslationOffsets.Array.data[{index}]", minOffset, maxOffset);
+                }
+            }
+        }
+
+        private static void AnimScaleConstraintOffsets(ref AnimationClip clip, float initialToMinHeightRatio, float initialToMaxHeightRatio)
+        {
+            if (!scaleScaleConstraintOffsets) return;
+
+            var scaleConstraints = cvrAvatar.gameObject.GetComponentsInChildren<ScaleConstraint>(true);
+            foreach (var scaleConstraint in scaleConstraints)
+            {
+                // Calculate min and max offsets for scale at rest offset
+                Vector3 minRestOffset = scaleConstraint.scaleAtRest * initialToMinHeightRatio;
+                Vector3 maxRestOffset = scaleConstraint.scaleAtRest * initialToMaxHeightRatio;
+                AnimateVector3Property(ref clip, scaleConstraint, "m_ScaleAtRest", minRestOffset, maxRestOffset);
+
+                // Calculate min and max offsets for scale offset
+                Vector3 minScaleOffset = scaleConstraint.scaleOffset * initialToMinHeightRatio;
+                Vector3 maxScaleOffset = scaleConstraint.scaleOffset * initialToMaxHeightRatio;
+                AnimateVector3Property(ref clip, scaleConstraint, "m_ScaleOffset", minScaleOffset, maxScaleOffset);
             }
         }
 
