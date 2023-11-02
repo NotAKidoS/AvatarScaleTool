@@ -39,6 +39,9 @@ namespace NAK.EditorTools
             AnimParentConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
             AnimPositionConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
             AnimScaleConstraintOffsets(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
+            
+            // Other Scaling
+            AnimScaleTrailRendererWidth(ref clip, initialToMinHeightRatio, initialToMaxHeightRatio);
 
             return clip;
         }
@@ -298,6 +301,23 @@ namespace NAK.EditorTools
                 Vector3 minScaleOffset = scaleConstraint.scaleOffset * initialToMinHeightRatio;
                 Vector3 maxScaleOffset = scaleConstraint.scaleOffset * initialToMaxHeightRatio;
                 AnimateVector3Property(ref clip, scaleConstraint, "m_ScaleOffset", minScaleOffset, maxScaleOffset);
+            }
+        }
+        
+        private static void AnimScaleTrailRendererWidth(ref AnimationClip clip, float initialToMinHeightRatio, float initialToMaxHeightRatio)
+        {
+            if (!scaleTrailRendererWidth) return;
+
+            var trailRenderers = cvrAvatar.gameObject.GetComponentsInChildren<TrailRenderer>(true);
+            foreach (var trailRenderer in trailRenderers)
+            {
+                // Calculate min and max width multiplier for trail renderer
+                float minWidth = trailRenderer.widthMultiplier * initialToMinHeightRatio;
+                float maxWidth = trailRenderer.widthMultiplier * initialToMaxHeightRatio;
+
+                // Animate the width of the trail renderer
+                string path = AnimationUtility.CalculateTransformPath(trailRenderer.transform, cvrAvatar.transform);
+                AnimateFloatProperty(ref clip, path, trailRenderer, "m_Parameters.widthMultiplier", minWidth, maxWidth);
             }
         }
 

@@ -19,11 +19,11 @@ namespace NAK.EditorTools
         public static float minimumHeight = 0.5f;
         public static float maximumHeight = 2.0f;
         public static bool motionScaleFloat = true;
-        public static bool scaleDynamicBone = false;
         public static bool scaleAudioSources = true;
         public static bool scalePositionConstraintOffsets = false;
         public static bool scaleParentConstraintOffsets = false;
         public static bool scaleScaleConstraintOffsets = false;
+        public static bool scaleTrailRendererWidth = false;
         public static bool splitAnimationClip = false;
         public static bool useGlobalScaleSettings = true;
 

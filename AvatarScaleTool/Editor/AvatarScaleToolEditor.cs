@@ -176,6 +176,9 @@ namespace NAK.EditorTools
                 GUIContent splitAnimationClipContent = new GUIContent("Split Animation Clip", "Should the exported clip be split into two clips for use in blendtrees?");
                 splitAnimationClip = EditorGUILayout.Toggle(splitAnimationClipContent, splitAnimationClip);
 
+                GUIContent scaleTrailRendererWidthContent = new GUIContent("Scale Trail Renderer Width", "Automatically scale Trail Renderer width.");
+                scaleTrailRendererWidth = EditorGUILayout.Toggle(scaleTrailRendererWidthContent, scaleTrailRendererWidth);
+                
                 EditorGUILayout.EndVertical();
                 EditorGUILayout.BeginVertical();
 
