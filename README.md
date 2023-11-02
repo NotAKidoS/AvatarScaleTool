@@ -4,16 +4,20 @@ Avatar Scale Tool is an editor script that generates avatar scaling animations f
 
 The tool is located under `NotAKid/Avatar Scale Tool`.
 
-![image](https://user-images.githubusercontent.com/37721153/226088034-7b518420-7f37-4c14-a8c1-ec02b9104931.png)
+![image](https://user-images.githubusercontent.com/37721153/235814026-253c4d63-5660-47f2-8a3a-3d5b7da93435.png)
 
 ## How to Use
 * Select the target avatar.
 * Input the desired minimum and maximum heights in meters. The viewpoint position is assumed to be the initial height.
-* Modify the Reference Avatar Height to match the height your locomotion animations are rigged for. 
-  * This step is optional if you don't plan on using the #MotionScale parameter.
-  * The default CCK locomotion animations work well with **1.8m** as the avatar reference height.
-* Generate the animation clip and add it to your avatar's animation controller.
-  * The generated animation clip is intended to be used with motion time.
+* Select which components/properties you want to have scaled under Optional Settings.
+
+* Click `Add To AAS` if you want it to automatically add the slider & animation clips to your Avatar Advanced Settings.
+  * This will place the generated clips into your `AdvancedSettings.Generated` folder and add the AAS Slider entry.
+  * Make sure to click **CreateAnimator** in your CVRAvatar component!
+
+* Click `Export` if you want only the generated animation clip. 
+  * `Split Animation Clip` will determine if it exports two clips for a blendtree or one clip for motion time.
+  * This is meant for creators making their controllers manually outside of the CVRAvatar AAS autogeneration GUI.
 
 Use the **Initial Height Percentage** value to set your *default* slider value in your controller & Avatar Advanced Settings (AAS).
 
